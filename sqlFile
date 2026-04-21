@@ -1,0 +1,17 @@
+Create table data_set(
+	id integer generated always as indetity primary key,
+	InvoiceNo varchar(20),
+	StockCode varchar(20),
+	Description text,
+	Quantity double,
+	InvoiceDate timestamp,
+	UnitPrice double,
+	Country text
+)
+
+
+
+
+copy data_set
+from '/mnt/datassd/CodeHub/Science/CustomerSegmentation/dataset/data.csv'
+with (FORMAT CSV, HEADER)
