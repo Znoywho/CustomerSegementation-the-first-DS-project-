@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Segmentation Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #6c63ff;
+    --accent2: #ff6b6b;
+    --accent3: #43e97b;
+    --accent4: #f7971e;
+    --text: #e8e8f0;
+    --text2: #888899;
+    --text3: #555566;
+
+    --c0: #ff6b6b;
+    --c1: #f7971e;
+    --c2: #6c63ff;
+    --c3: #43e97b;
+    --c4: #00d2ff;
+    --c5: #f953c6;
+    --c6: #b8c0ff;
+    --c7: #ffdd57;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .header-meta {
+    font-size: 12px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* LAYOUT */
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+
+  /* KPI CARDS */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .kpi-card:hover { border-color: var(--accent); }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .kpi-label {
+    font-size: 11px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 6px;
+  }
+
+  /* CLUSTER INSIGHTS */
+  .insight-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .insight-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .insight-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text2);
+  }
+
+  .insight-sub {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .insight-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .insight-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .insight-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .insight-cluster {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .insight-count {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .insight-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .insight-metric {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  .insight-metric-label {
+    font-size: 9px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .insight-metric-value {
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .mix-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .mix-row {
+    display: grid;
+    grid-template-columns: 56px 1fr 38px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .mix-label {
+    font-size: 10px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .mix-track {
+    height: 6px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+
+  .mix-fill {
+    height: 100%;
+    border-radius: 4px;
+  }
+
+  .mix-val {
+    text-align: right;
+    font-size: 10px;
+    color: var(--text2);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .word-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .word-tag {
+    font-size: 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 7px;
+    color: var(--text2);
+    background: rgba(255,255,255,0.02);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* MAIN GRID */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 20px;
+  }
+
+  /* SIDEBAR FILTER */
+  .sidebar {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    height: fit-content;
+    position: sticky;
+    top: 80px;
+  }
+
+  .sidebar-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text2);
+    margin-bottom: 16px;
+  }
+
+  .cluster-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .cluster-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .cluster-btn:hover { background: var(--bg3); border-color: var(--accent); }
+  .cluster-btn.active { background: var(--bg3); border-color: var(--accent); }
+
+  .cluster-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .cluster-count {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* SEARCH */
+  .search-box {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .search-box:focus { border-color: var(--accent); }
+  .search-box::placeholder { color: var(--text3); }
+
+  /* SORT SELECT */
+  .sort-select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .action-btn {
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .action-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .keyword-box {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+
+  .mini-label {
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 8px;
+  }
+
+  .mini-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-size: 12px;
+    outline: none;
+    margin-bottom: 8px;
+  }
+
+  .mini-input:focus { border-color: var(--accent); }
+
+  .keyword-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .keyword-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .keyword-remove {
+    border: none;
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    font-size: 12px;
+  }
+
+  .keyword-muted {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* TABLE AREA */
+  .table-area {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .table-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text2);
+  }
+
+  .result-count {
+    font-size: 12px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .result-meta {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+    margin-top: 2px;
+  }
+
+  .table-header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .table-wrapper { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text3);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  thead th:hover { color: var(--accent); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+    cursor: pointer;
+  }
+
+  tbody tr:hover { background: var(--bg3); }
+  tbody tr:last-child { border-bottom: none; }
+
+  tbody td {
+    padding: 12px 16px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .cluster-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.3);
+  }
+
+  .num-cell { font-family: 'Space Mono', monospace; font-size: 12px; }
+
+  .bar-cell { display: flex; align-items: center; gap: 8px; }
+  .mini-bar {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--accent);
+    min-width: 2px;
+    transition: width 0.3s;
+  }
+
+  /* PAGINATION */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .page-btn {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .page-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    width: 560px;
+    max-width: 90vw;
+    position: relative;
+    animation: modalIn 0.2s ease;
+  }
+
+  @keyframes modalIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text2);
+    width: 28px; height: 28px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .modal-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text2);
+    margin-bottom: 6px;
+  }
+
+  .modal-id {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  .modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .modal-field {
+    background: var(--bg3);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+
+  .modal-field-label {
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .modal-field-value {
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .categ-bars { display: flex; flex-direction: column; gap: 8px; }
+  .categ-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .categ-label { color: var(--text3); width: 60px; font-family: 'Space Mono', monospace; font-size: 10px; }
+  .categ-track { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+  .categ-fill { height: 100%; border-radius: 3px; background: var(--accent); }
+  .categ-pct { color: var(--text2); font-size: 11px; font-family: 'Space Mono', monospace; width: 36px; text-align: right; }
+
+  /* LOADING */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    gap: 12px;
+  }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* CLUSTER LEGEND */
+  .legend-section { margin-top: 20px; }
+  .legend-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+
+  .empty-state {
+    padding: 60px;
+    text-align: center;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+  }
+
+  @media (max-width: 1100px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .main-grid { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .insight-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 700px) {
+    .container { padding: 16px; }
+    .kpi-row { grid-template-columns: 1fr; }
+    .insight-metrics { grid-template-columns: 1fr; }
+    .table-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .table-header-right { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">◈ Customer Segments</div>
+  <div class="header-meta" id="header-date"></div>
+</header>
+
+<div class="container">
+
+  <!-- KPI -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng khách hàng</div>
+      <div class="kpi-value" id="kpi-total">—</div>
+      <div class="kpi-sub">Đã phân cluster</div>
+    </div>
+    <div class="kpi-card" style="--accent:#43e97b">
+      <div class="kpi-label">Số cluster</div>
+      <div class="kpi-value" id="kpi-clusters">—</div>
+      <div class="kpi-sub">K-Means segments</div>
+    </div>
+    <div class="kpi-card" style="--accent:#f7971e">
+      <div class="kpi-label">Avg. Đơn hàng</div>
+      <div class="kpi-value" id="kpi-avg-count">—</div>
+      <div class="kpi-sub">Trên mỗi khách</div>
+    </div>
+    <div class="kpi-card" style="--accent:#ff6b6b">
+      <div class="kpi-label">Avg. Doanh thu</div>
+      <div class="kpi-value" id="kpi-avg-sum">—</div>
+      <div class="kpi-sub">Trên mỗi khách</div>
+    </div>
+  </div>
+
+  <div class="insight-wrap">
+    <div class="insight-header">
+      <div class="insight-title">Cluster Insights (Graphic)</div>
+      <div class="insight-sub" id="insight-sub">—</div>
+    </div>
+    <div class="insight-grid" id="cluster-insights"></div>
+  </div>
+
+  <div class="main-grid">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-title">Bộ lọc</div>
+
+      <input type="text" class="search-box" id="search-input" placeholder="🔍  Tìm CustomerID...">
+
+      <div class="sidebar-title" style="margin-top:16px">Cluster</div>
+      <div class="cluster-filter" id="cluster-filter">
+        <button class="cluster-btn active" data-cluster="all" onclick="filterCluster('all', this)">
+          <span class="cluster-dot" style="background:#888"></span>
+          Tất cả
+          <span class="cluster-count" id="count-all">0</span>
+        </button>
+      </div>
+
+      <div class="sidebar-title" style="margin-top:16px">Sắp xếp theo</div>
+      <select class="sort-select" id="sort-select" onchange="applySort()">
+        <option value="CustomerID">CustomerID</option>
+        <option value="cluster">Cluster</option>
+        <option value="count_desc">Đơn hàng (cao → thấp)</option>
+        <option value="count_asc">Đơn hàng (thấp → cao)</option>
+        <option value="sum_desc">Doanh thu (cao → thấp)</option>
+        <option value="sum_asc">Doanh thu (thấp → cao)</option>
+        <option value="LastPurchase_asc">Mua gần đây nhất</option>
+        <option value="LastPurchase_desc">Mua lâu nhất</option>
+      </select>
+
+      <div class="action-row">
+        <button class="action-btn" onclick="resetFilters()">Reset</button>
+        <button class="action-btn" onclick="exportFilteredCsv()">Export</button>
+      </div>
+
+      <div class="keyword-box">
+        <div class="mini-label">Lọc theo keyword</div>
+        <input type="text" class="mini-input" id="keyword-filter-input" placeholder="vd: vip, churn-risk, discount-lover">
+        <div class="keyword-muted" id="keyword-filter-meta">Không dùng keyword filter</div>
+      </div>
+
+      <div class="keyword-box">
+        <div class="mini-label">Keyword cho cluster</div>
+        <select class="sort-select" id="cluster-keyword-select"></select>
+        <input type="text" class="mini-input" id="cluster-keyword-input" placeholder="Nhập keyword và Enter">
+        <div class="keyword-chips" id="cluster-keyword-chips"></div>
+        <div class="keyword-muted" id="cluster-interp-hint" style="margin-top:8px"></div>
+      </div>
+
+      <div class="legend-section">
+        <div class="legend-title">Màu cluster</div>
+        <div id="legend-items" style="display:flex;flex-direction:column;gap:6px;font-size:12px;"></div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-area">
+      <div class="table-header">
+        <div class="table-title">Danh sách khách hàng</div>
+        <div class="table-header-right">
+          <div class="result-count" id="result-count">— kết quả</div>
+          <div class="result-meta" id="result-meta">—</div>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="setSortFromHeader('CustomerID')">CustomerID</th>
+              <th onclick="setSortFromHeader('cluster')">Cluster</th>
+              <th onclick="setSortFromHeader('count')">Đơn hàng</th>
+              <th onclick="setSortFromHeader('sum')">Doanh thu</th>
+              <th onclick="setSortFromHeader('LastPurchase')">Ngày cuối (ngày trước)</th>
+              <th>Categ mix</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr><td colspan="6"><div class="loading"><div class="spinner"></div> Đang tải dữ liệu...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">Chi tiết khách hàng</div>
+    <div class="modal-id" id="modal-id"></div>
+    <div class="modal-grid" id="modal-grid"></div>
+    <div class="sidebar-title">Phân bổ danh mục</div>
+    <div class="categ-bars" id="modal-categ"></div>
+    <div class="sidebar-title" style="margin-top:14px">Keyword theo khách hàng</div>
+    <input type="text" class="mini-input" id="customer-keyword-input" placeholder="Nhập keyword cho khách này và Enter">
+    <div class="keyword-chips" id="customer-keyword-chips"></div>
+    <div class="keyword-muted" id="customer-keyword-hint" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+const CSV_URL = './artifacts/dashboard/customer_segments.csv';
+const CLUSTER_INTERPRET_URL = './artifacts/dashboard/cluster_word_category_interpretation.csv';
+const PAGE_SIZE = 20;
+
+const CLUSTER_COLORS = [
+  '#ff6b6b','#f7971e','#6c63ff','#43e97b',
+  '#00d2ff','#f953c6','#b8c0ff','#ffdd57',
+  '#ff9a9e','#a18cd1','#84fab0','#fccb90'
+];
+
+const CLUSTER_LABELS = [
+  'Cluster 0','Cluster 1','Cluster 2','Cluster 3',
+  'Cluster 4','Cluster 5','Cluster 6','Cluster 7'
+];
+
+// ── STATE ───────────────────────────────────────────────
+let allData = [];
+let filtered = [];
+let currentCluster = 'all';
+let currentPage = 1;
+let maxSum = 1;
+let sortKey = 'CustomerID';
+let activeDataSource = 'CSV';
+let keywordFilter = '';
+let selectedCustomerId = null;
+const KEYWORD_STORE_KEY = 'segmentation.keywordStore.v1';
+let keywordStore = { cluster: {}, customer: {} };
+let clusterInterpretationMap = {};
+let clusterDisplayNames = {};
+
+// ── INIT ────────────────────────────────────────────────
+document.getElementById('header-date').textContent =
+  new Date().toLocaleDateString('vi-VN', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+document.getElementById('search-input').addEventListener('input', () => {
+  currentPage = 1;
+  applyFilters();
+});
+
+document.getElementById('keyword-filter-input').addEventListener('input', e => {
+  keywordFilter = normalizeKeyword(e.target.value || '');
+  currentPage = 1;
+  applyFilters();
+});
+
+document.getElementById('cluster-keyword-select').addEventListener('change', () => {
+  renderClusterKeywordChips();
+});
+
+document.getElementById('cluster-keyword-input').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const cluster = document.getElementById('cluster-keyword-select').value;
+  const keyword = normalizeKeyword(e.target.value || '');
+  if (!cluster || !keyword) return;
+  addKeyword('cluster', cluster, keyword);
+  e.target.value = '';
+  renderClusterKeywordChips();
+  applyFilters();
+});
+
+document.getElementById('customer-keyword-input').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const keyword = normalizeKeyword(e.target.value || '');
+  if (!selectedCustomerId || !keyword) return;
+  addKeyword('customer', String(selectedCustomerId), keyword);
+  e.target.value = '';
+  renderCustomerKeywordPanel(selectedCustomerId);
+  applyFilters();
+});
+
+// Load CSV
+Papa.parse(CSV_URL, {
+  download: true,
+  header: true,
+  dynamicTyping: true,
+  complete: res => {
+    allData = res.data.filter(r => r.CustomerID);
+    hydrateKeywordStore();
+    buildClusterDisplayNames();
+    maxSum = Math.max(...allData.map(r => r.sum || 0));
+    activeDataSource = 'CSV';
+    buildKPI();
+    buildClusterFilter();
+    buildLegend();
+    initClusterKeywordControls();
+    loadClusterInterpretation();
+    updateHeaderMeta();
+    applyFilters();
+  },
+  error: () => {
+    // Fallback: generate demo data
+    allData = generateDemoData();
+    hydrateKeywordStore();
+    buildClusterDisplayNames();
+    maxSum = Math.max(...allData.map(r => r.sum || 0));
+    activeDataSource = 'DEMO';
+    buildKPI();
+    buildClusterFilter();
+    buildLegend();
+    initClusterKeywordControls();
+    loadClusterInterpretation();
+    updateHeaderMeta();
+    applyFilters();
+  }
+});
+
+// ── DEMO DATA (fallback nếu chưa có CSV) ───────────────
+function generateDemoData() {
+  const data = [];
+  for (let i = 0; i < 200; i++) {
+    const cluster = Math.floor(Math.random() * 4);
+    const count = Math.floor(Math.random() * 50) + 1;
+    const sum = Math.round((Math.random() * 8000 + 100) * 100) / 100;
+    data.push({
+      CustomerID: 12000 + i,
+      cluster,
+      count,
+      sum,
+      LastPurchase: Math.floor(Math.random() * 365),
+      categ_0: Math.round(Math.random() * 60 * 10) / 10,
+      categ_1: Math.round(Math.random() * 40 * 10) / 10,
+      categ_2: Math.round(Math.random() * 30 * 10) / 10,
+      categ_3: Math.round(Math.random() * 20 * 10) / 10,
+      categ_4: Math.round(Math.random() * 15 * 10) / 10,
+    });
+  }
+  return data;
+}
+
+// ── KPI ─────────────────────────────────────────────────
+function buildKPI() {
+  const n = allData.length;
+  const clusters = new Set(allData.map(r => r.cluster)).size;
+  const avgCount = n ? (allData.reduce((a, r) => a + (r.count || 0), 0) / n).toFixed(1) : '0.0';
+  const avgSum   = n ? (allData.reduce((a, r) => a + (r.sum   || 0), 0) / n).toFixed(0) : '0';
+
+  document.getElementById('kpi-total').textContent = n.toLocaleString('vi-VN');
+  document.getElementById('kpi-clusters').textContent = clusters;
+  document.getElementById('kpi-avg-count').textContent = avgCount;
+  document.getElementById('kpi-avg-sum').textContent = '£' + Number(avgSum).toLocaleString('vi-VN');
+}
+
+// ── CLUSTER FILTER ──────────────────────────────────────
+function buildClusterFilter() {
+  const counts = {};
+  allData.forEach(r => { counts[r.cluster] = (counts[r.cluster] || 0) + 1; });
+
+  const container = document.getElementById('cluster-filter');
+  document.getElementById('count-all').textContent = allData.length;
+
+  Object.entries(counts).sort((a,b) => a[0]-b[0]).forEach(([c, cnt]) => {
+    const btn = document.createElement('button');
+    btn.className = 'cluster-btn';
+    btn.dataset.cluster = c;
+    btn.onclick = () => filterCluster(c, btn);
+    btn.innerHTML = `
+      <span class="cluster-dot" style="background:${CLUSTER_COLORS[c] || '#888'}"></span>
+      ${getClusterDisplayName(c)}
+      <span class="cluster-count">${cnt}</span>
+    `;
+    container.appendChild(btn);
+  });
+}
+
+function buildLegend() {
+  const clusters = [...new Set(allData.map(r => r.cluster))].sort((a,b)=>a-b);
+  const legend = document.getElementById('legend-items');
+  clusters.forEach(c => {
+    const el = document.createElement('div');
+    el.style.cssText = 'display:flex;align-items:center;gap:8px;color:var(--text2)';
+    el.innerHTML = `<span style="width:10px;height:10px;border-radius:50%;background:${CLUSTER_COLORS[c]};flex-shrink:0"></span>${getClusterDisplayName(c)}`;
+    legend.appendChild(el);
+  });
+}
+
+function filterCluster(c, btn) {
+  currentCluster = c;
+  currentPage = 1;
+  document.querySelectorAll('.cluster-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+// ── FILTERS + SORT ──────────────────────────────────────
+function applySort() {
+  sortKey = document.getElementById('sort-select').value;
+  currentPage = 1;
+  applyFilters();
+}
+
+function setSortFromHeader(key) {
+  const map = {
+    CustomerID: ['CustomerID', 'CustomerID_desc'],
+    cluster: ['cluster', 'cluster_desc'],
+    count: ['count_desc', 'count_asc'],
+    sum: ['sum_desc', 'sum_asc'],
+    LastPurchase: ['LastPurchase_asc', 'LastPurchase_desc']
+  };
+  const values = map[key] || ['CustomerID', 'CustomerID_desc'];
+  sortKey = sortKey === values[0] ? values[1] : values[0];
+  const select = document.getElementById('sort-select');
+  const hasOption = Array.from(select.options).some(o => o.value === sortKey);
+  select.value = hasOption ? sortKey : 'CustomerID';
+  currentPage = 1;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+
+  filtered = allData.filter(r => {
+    const matchCluster = currentCluster === 'all' || String(r.cluster) === String(currentCluster);
+    const matchSearch  = !q || String(r.CustomerID).includes(q);
+    const matchKeyword = !keywordFilter || getRowKeywords(r).some(k => k.includes(keywordFilter));
+    return matchCluster && matchSearch && matchKeyword;
+  });
+
+  // Sort
+  filtered.sort((a, b) => {
+    switch(sortKey) {
+      case 'CustomerID_desc':    return b.CustomerID - a.CustomerID;
+      case 'cluster':           return a.cluster - b.cluster;
+      case 'cluster_desc':      return b.cluster - a.cluster;
+      case 'count_desc':        return (b.count||0) - (a.count||0);
+      case 'count_asc':         return (a.count||0) - (b.count||0);
+      case 'sum_desc':          return (b.sum||0) - (a.sum||0);
+      case 'sum_asc':           return (a.sum||0) - (b.sum||0);
+      case 'LastPurchase_asc':  return (a.LastPurchase||0) - (b.LastPurchase||0);
+      case 'LastPurchase_desc': return (b.LastPurchase||0) - (a.LastPurchase||0);
+      default:                  return a.CustomerID - b.CustomerID;
+    }
+  });
+
+  document.getElementById('result-count').textContent = filtered.length.toLocaleString('vi-VN') + ' kết quả';
+  updateResultMeta();
+  renderClusterInsights(filtered);
+  renderTable();
+  renderPagination();
+}
+
+function updateHeaderMeta() {
+  const dt = new Date().toLocaleDateString('vi-VN', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  document.getElementById('header-date').textContent = `${dt}  ·  DATA: ${activeDataSource}`;
+}
+
+function updateResultMeta() {
+  if (!filtered.length) {
+    document.getElementById('result-meta').textContent = 'avg order: 0.0 · avg revenue: £0';
+    return;
+  }
+  const avgOrder = (filtered.reduce((acc, r) => acc + (r.count || 0), 0) / filtered.length).toFixed(1);
+  const avgRevenue = Math.round(filtered.reduce((acc, r) => acc + (r.sum || 0), 0) / filtered.length);
+  document.getElementById('result-meta').textContent =
+    `avg order: ${avgOrder} · avg revenue: £${avgRevenue.toLocaleString('vi-VN')}`;
+  document.getElementById('keyword-filter-meta').textContent = keywordFilter
+    ? `Đang lọc keyword: "${keywordFilter}"`
+    : 'Không dùng keyword filter';
+}
+
+function resetFilters() {
+  currentCluster = 'all';
+  currentPage = 1;
+  sortKey = 'CustomerID';
+  keywordFilter = '';
+  document.getElementById('search-input').value = '';
+  document.getElementById('keyword-filter-input').value = '';
+  document.getElementById('sort-select').value = 'CustomerID';
+  document.querySelectorAll('.cluster-btn').forEach(b => b.classList.remove('active'));
+  const allBtn = document.querySelector('.cluster-btn[data-cluster="all"]');
+  if (allBtn) allBtn.classList.add('active');
+  applyFilters();
+}
+
+function exportFilteredCsv() {
+  if (!filtered.length) return;
+  const columns = ['CustomerID','cluster','count','sum','LastPurchase','categ_0','categ_1','categ_2','categ_3','categ_4','min','max','mean'];
+  const csv = Papa.unparse(filtered.map(row => {
+    const o = {};
+    columns.forEach(c => { o[c] = row[c] ?? ''; });
+    return o;
+  }));
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `filtered_customers_${Date.now()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// ── TABLE ───────────────────────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const page  = filtered.slice(start, start + PAGE_SIZE);
+
+  if (page.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state">Không tìm thấy kết quả</div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = page.map(r => {
+    const color = CLUSTER_COLORS[r.cluster] || '#888';
+    const barW  = Math.round(((r.sum || 0) / maxSum) * 80);
+    const categTotal = (r.categ_0||0)+(r.categ_1||0)+(r.categ_2||0)+(r.categ_3||0)+(r.categ_4||0);
+
+    // Mini categ bars (top 2 categories)
+    const categArr = [r.categ_0,r.categ_1,r.categ_2,r.categ_3,r.categ_4].map((v,i)=>({v:v||0,i}));
+    const top2 = [...categArr].sort((a,b)=>b.v-a.v).slice(0,2);
+    const categHtml = top2.map(c =>
+      `<div style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace">
+        C${c.i}: ${c.v.toFixed(1)}%
+       </div>`
+    ).join('');
+
+    return `<tr onclick="openModal(${r.CustomerID})">
+      <td class="num-cell" style="color:var(--text)">${r.CustomerID}</td>
+      <td>
+        <span class="cluster-badge" style="background:${color}22;border-color:${color}55;color:${color}">
+          <span style="width:6px;height:6px;border-radius:50%;background:${color}"></span>
+          ${r.cluster}
+        </span>
+      </td>
+      <td class="num-cell">${(r.count||0).toLocaleString('vi-VN')}</td>
+      <td>
+        <div class="bar-cell">
+          <div class="mini-bar" style="width:${barW}px;background:${color}88"></div>
+          <span class="num-cell" style="font-size:11px">£${(r.sum||0).toLocaleString('vi-VN')}</span>
+        </div>
+      </td>
+      <td class="num-cell" style="color:${(r.LastPurchase||0)<30?'#43e97b':(r.LastPurchase||0)<90?'#f7971e':'#ff6b6b'}">
+        ${r.LastPurchase || 0} ngày
+      </td>
+      <td>${categHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── PAGINATION ──────────────────────────────────────────
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  const pag = document.getElementById('pagination');
+  if (total <= 1) { pag.innerHTML = ''; return; }
+
+  let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+
+  for (let i = 1; i <= total; i++) {
+    if (total > 7 && i > 2 && i < total-1 && Math.abs(i-currentPage) > 1) {
+      if (i === 3 || i === total-2) html += `<span style="color:var(--text3);padding:0 4px">…</span>`;
+      continue;
+    }
+    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>›</button>`;
+  pag.innerHTML = html;
+}
+
+function goPage(p) {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  if (p < 1 || p > total) return;
+  currentPage = p;
+  renderTable();
+  renderPagination();
+  document.querySelector('.table-area').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── MODAL ───────────────────────────────────────────────
+function openModal(customerId) {
+  const r = allData.find(d => d.CustomerID == customerId);
+  if (!r) return;
+  selectedCustomerId = customerId;
+
+  const color = CLUSTER_COLORS[r.cluster] || '#888';
+  document.getElementById('modal-id').innerHTML =
+    `#${r.CustomerID} <span style="font-size:14px;color:${color}">● ${getClusterDisplayName(r.cluster)}</span>`;
+
+  document.getElementById('modal-grid').innerHTML = [
+    ['Đơn hàng', (r.count||0).toLocaleString('vi-VN')],
+    ['Doanh thu', '£' + (r.sum||0).toLocaleString('vi-VN', {minimumFractionDigits:2})],
+    ['Mua lần cuối', (r.LastPurchase||0) + ' ngày trước'],
+    ['Min basket', '£' + (r.min||0).toFixed(2)],
+    ['Max basket', '£' + (r.max||0).toFixed(2)],
+    ['Avg basket', '£' + (r.mean||0).toFixed(2)],
+  ].map(([label, val]) => `
+    <div class="modal-field">
+      <div class="modal-field-label">${label}</div>
+      <div class="modal-field-value">${val}</div>
+    </div>
+  `).join('');
+
+  const categs = [r.categ_0,r.categ_1,r.categ_2,r.categ_3,r.categ_4].map((v,i)=>({v:v||0,i}));
+  document.getElementById('modal-categ').innerHTML = categs.map(c => `
+    <div class="categ-row">
+      <span class="categ-label">categ_${c.i}</span>
+      <div class="categ-track">
+        <div class="categ-fill" style="width:${Math.min(c.v,100)}%;background:${color}"></div>
+      </div>
+      <span class="categ-pct">${c.v.toFixed(1)}%</span>
+    </div>
+  `).join('');
+
+  renderCustomerKeywordPanel(customerId);
+
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal') || e.currentTarget.tagName === 'BUTTON') {
+    document.getElementById('modal').classList.remove('show');
+  }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function normalizeKeyword(value) {
+  return String(value || '').trim().toLowerCase().replace(/\s+/g, '-');
+}
+
+function hydrateKeywordStore() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(KEYWORD_STORE_KEY) || '{}');
+    keywordStore = {
+      cluster: parsed.cluster && typeof parsed.cluster === 'object' ? parsed.cluster : {},
+      customer: parsed.customer && typeof parsed.customer === 'object' ? parsed.customer : {}
+    };
+  } catch {
+    keywordStore = { cluster: {}, customer: {} };
+  }
+}
+
+function persistKeywordStore() {
+  localStorage.setItem(KEYWORD_STORE_KEY, JSON.stringify(keywordStore));
+}
+
+function addKeyword(scope, targetId, keyword) {
+  const bucket = keywordStore[scope];
+  if (!bucket[targetId]) bucket[targetId] = [];
+  if (!bucket[targetId].includes(keyword)) bucket[targetId].push(keyword);
+  persistKeywordStore();
+}
+
+function removeKeyword(scope, targetId, keyword) {
+  const bucket = keywordStore[scope];
+  if (!bucket[targetId]) return;
+  bucket[targetId] = bucket[targetId].filter(k => k !== keyword);
+  if (!bucket[targetId].length) delete bucket[targetId];
+  persistKeywordStore();
+}
+
+function getRowKeywords(row) {
+  const clusterKeywords = keywordStore.cluster[String(row.cluster)] || [];
+  const customerKeywords = keywordStore.customer[String(row.CustomerID)] || [];
+  return [...new Set([...clusterKeywords, ...customerKeywords])];
+}
+
+function initClusterKeywordControls() {
+  const select = document.getElementById('cluster-keyword-select');
+  const clusters = [...new Set(allData.map(r => r.cluster))].sort((a, b) => a - b);
+  select.innerHTML = clusters.map(c => `<option value="${c}">${getClusterDisplayName(c)}</option>`).join('');
+  renderClusterKeywordChips();
+}
+
+function renderClusterKeywordChips() {
+  const selectedCluster = document.getElementById('cluster-keyword-select').value;
+  const chips = document.getElementById('cluster-keyword-chips');
+  const values = keywordStore.cluster[selectedCluster] || [];
+  const interp = clusterInterpretationMap[selectedCluster];
+  if (!values.length) {
+    chips.innerHTML = '<span class="keyword-muted">Chưa có keyword cho cluster này</span>';
+  } else {
+    chips.innerHTML = values.map(k => `
+      <span class="keyword-chip">
+        ${k}
+        <button class="keyword-remove" onclick="handleRemoveKeyword('cluster','${selectedCluster}','${k}')">×</button>
+      </span>
+    `).join('');
+  }
+  document.getElementById('cluster-interp-hint').textContent = interp
+    ? `${interp.top_category} (${interp.top_category_percent}%) · ${interp.hypothesis}`
+    : 'Chưa có mô tả cho cluster này trong file interpretation';
+}
+
+function renderCustomerKeywordPanel(customerId) {
+  const r = allData.find(d => d.CustomerID == customerId);
+  const chips = document.getElementById('customer-keyword-chips');
+  const values = keywordStore.customer[String(customerId)] || [];
+  const inherited = keywordStore.cluster[String(r.cluster)] || [];
+  if (!values.length) {
+    chips.innerHTML = '<span class="keyword-muted">Chưa có keyword riêng cho khách này</span>';
+  } else {
+    chips.innerHTML = values.map(k => `
+      <span class="keyword-chip">
+        ${k}
+        <button class="keyword-remove" onclick="handleRemoveKeyword('customer','${customerId}','${k}')">×</button>
+      </span>
+    `).join('');
+  }
+  document.getElementById('customer-keyword-hint').textContent = inherited.length
+    ? `Kế thừa từ ${getClusterDisplayName(r.cluster)}: ${inherited.join(', ')}`
+    : `${getClusterDisplayName(r.cluster)} chưa có keyword chung`;
+}
+
+function handleRemoveKeyword(scope, targetId, keyword) {
+  removeKeyword(scope, String(targetId), keyword);
+  if (scope === 'cluster') renderClusterKeywordChips();
+  if (scope === 'customer' && selectedCustomerId) renderCustomerKeywordPanel(selectedCustomerId);
+  applyFilters();
+}
+
+function loadClusterInterpretation() {
+  Papa.parse(CLUSTER_INTERPRET_URL, {
+    download: true,
+    header: true,
+    dynamicTyping: true,
+    complete: res => {
+      const rows = (res.data || []).filter(r => r && r.cluster !== undefined && r.top_words);
+      clusterInterpretationMap = {};
+      rows.forEach(r => {
+        const key = String(r.cluster);
+        clusterInterpretationMap[key] = {
+          top_category: r.top_category || '',
+          top_category_percent: r.top_category_percent || '',
+          hypothesis: r.hypothesis || '',
+          top_words: String(r.top_words || '')
+        };
+
+        const parsedKeywords = String(r.top_words || '')
+          .split(',')
+          .map(w => normalizeKeyword(w))
+          .filter(Boolean);
+        parsedKeywords.forEach(k => addKeyword('cluster', key, k));
+      });
+      renderClusterKeywordChips();
+      applyFilters();
+    },
+    error: () => {
+      clusterInterpretationMap = {};
+      renderClusterKeywordChips();
+    }
+  });
+}
+
+function renderClusterInsights(rows) {
+  const container = document.getElementById('cluster-insights');
+  const subtitle = document.getElementById('insight-sub');
+
+  const grouped = {};
+  rows.forEach(r => {
+    const key = String(r.cluster);
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(r);
+  });
+
+  const allClusters = [...new Set(allData.map(r => String(r.cluster)))].sort((a, b) => Number(a) - Number(b));
+  if (!allClusters.length) {
+    container.innerHTML = '<div class="empty-state" style="padding:20px">Không có dữ liệu cluster</div>';
+    subtitle.textContent = '0 cluster hiển thị';
+    return;
+  }
+  subtitle.textContent = `${allClusters.length} cluster tổng · theo filter hiện tại`;
+
+  container.innerHTML = allClusters.map(c => {
+    const records = grouped[c] || [];
+    const n = records.length;
+    const color = CLUSTER_COLORS[c] || '#888';
+    const avgCount = n ? records.reduce((acc, r) => acc + (r.count || 0), 0) / n : 0;
+    const totalCount = records.reduce((acc, r) => acc + (r.count || 0), 0);
+    const avgSum = n ? records.reduce((acc, r) => acc + (r.sum || 0), 0) / n : 0;
+    const avgRecency = n ? records.reduce((acc, r) => acc + (r.LastPurchase || 0), 0) / n : 0;
+    const mix = [0, 1, 2, 3, 4].map(i => n ? records.reduce((acc, r) => acc + (r[`categ_${i}`] || 0), 0) / n : 0);
+    const wordsFromInterpret = (clusterInterpretationMap[c]?.top_words || '')
+      .split(',')
+      .map(w => normalizeKeyword(w))
+      .filter(Boolean)
+      .slice(0, 6);
+    const words = wordsFromInterpret.length ? wordsFromInterpret : (keywordStore.cluster[c] || []).slice(0, 6);
+    const topCategory = mix
+      .map((v, i) => ({ v, i }))
+      .sort((a, b) => b.v - a.v)[0];
+
+    return `
+      <div class="insight-card">
+        <div class="insight-card-head">
+          <div class="insight-cluster">
+            <span class="cluster-dot" style="background:${color}"></span>
+            ${getClusterDisplayName(c)}
+          </div>
+          <div class="insight-count">${n.toLocaleString('vi-VN')} customers</div>
+        </div>
+        <div class="insight-metrics">
+          <div class="insight-metric">
+            <div class="insight-metric-label">Avg Orders</div>
+            <div class="insight-metric-value">${avgCount.toFixed(1)}</div>
+          </div>
+          <div class="insight-metric">
+            <div class="insight-metric-label">Count</div>
+            <div class="insight-metric-value">${Math.round(totalCount).toLocaleString('vi-VN')}</div>
+          </div>
+          <div class="insight-metric">
+            <div class="insight-metric-label">Avg Revenue</div>
+            <div class="insight-metric-value">£${Math.round(avgSum).toLocaleString('vi-VN')}</div>
+          </div>
+          <div class="insight-metric">
+            <div class="insight-metric-label">Avg Recency</div>
+            <div class="insight-metric-value">${Math.round(avgRecency)}d</div>
+          </div>
+        </div>
+        <div class="mix-bars">
+          ${mix.map((v, i) => `
+            <div class="mix-row">
+              <div class="mix-label">categ_${i}</div>
+              <div class="mix-track">
+                <div class="mix-fill" style="width:${Math.min(v, 100)}%;background:${color}"></div>
+              </div>
+              <div class="mix-val">${v.toFixed(1)}%</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="keyword-muted" style="margin-bottom:6px">
+          Dominant: categ_${topCategory.i} (${topCategory.v.toFixed(1)}%)
+        </div>
+        <div class="word-tags">
+          ${words.length
+            ? words.map(w => `<span class="word-tag">${w}</span>`).join('')
+            : '<span class="keyword-muted">Chưa có top words</span>'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function buildClusterDisplayNames() {
+  clusterDisplayNames = {};
+  allData.forEach(r => {
+    const key = String(r.cluster);
+    if (!clusterDisplayNames[key] && r.cluster_name) {
+      clusterDisplayNames[key] = String(r.cluster_name);
+    }
+  });
+}
+
+function getClusterDisplayName(clusterId) {
+  const key = String(clusterId);
+  return clusterDisplayNames[key] || `Cluster ${key}`;
+}
+</script>
+</body>
+</html>

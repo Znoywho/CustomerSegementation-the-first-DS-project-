@@ -1,0 +1,148 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: #f5f7fb;
+  color: #132238;
+}
+
+.page-header {
+  padding: 20px 24px 10px;
+}
+
+.page-header h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+
+.page-header p {
+  margin: 0;
+  color: #4a5b72;
+}
+
+.container {
+  padding: 12px 24px 24px;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.cards {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.charts {
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+}
+
+.panel,
+.card {
+  background: #fff;
+  border: 1px solid #e1e6ef;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.insights {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.insight-item {
+  background: #f7f9fd;
+  border: 1px solid #e1e6ef;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.insight-item strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.word-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.word-tag {
+  background: #eaf0ff;
+  color: #234ecf;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.card h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.card .value {
+  font-weight: 700;
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.meta {
+  color: #63758f;
+  font-size: 13px;
+}
+
+.chart {
+  min-height: 320px;
+}
+
+.table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.hint {
+  margin: 6px 0 8px;
+  color: #63758f;
+  font-size: 13px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e9edf5;
+  text-align: left;
+  padding: 8px;
+  vertical-align: top;
+}
+
+th {
+  background: #f7f9fd;
+  position: sticky;
+  top: 0;
+}
+
+.table-wrap {
+  max-height: 420px;
+  overflow: auto;
+}
+
+select {
+  border: 1px solid #ccd6e4;
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: #fff;
+}

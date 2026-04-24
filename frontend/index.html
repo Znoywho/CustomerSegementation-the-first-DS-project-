@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Segmentation Dashboard</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+  <header class="page-header">
+    <h1>Customer Segmentation Dashboard</h1>
+    <p>Visualization for customer clusters, category behavior, and keyword interpretation.</p>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <div class="table-head">
+        <h2>Cluster Detail Explorer</h2>
+        <label>
+          Focus cluster:
+          <select id="clusterFocus"></select>
+        </label>
+      </div>
+      <div id="clusterInsights" class="insights"></div>
+    </section>
+
+    <section id="kpi-cards" class="grid cards"></section>
+
+    <section class="grid charts">
+      <article class="panel">
+        <h2>Customers Per Cluster</h2>
+        <div id="customersBar" class="chart"></div>
+      </article>
+      <article class="panel">
+        <h2>Category Mix by Cluster</h2>
+        <div id="categoryStacked" class="chart"></div>
+      </article>
+    </section>
+
+    <section class="grid charts">
+      <article class="panel">
+        <h2>Selected Cluster vs Overall Metrics</h2>
+        <div id="clusterCompare" class="chart"></div>
+      </article>
+      <article class="panel">
+        <h2>Selected Cluster Category Profile</h2>
+        <div id="clusterCategoryDonut" class="chart"></div>
+      </article>
+    </section>
+
+    <section class="grid charts">
+      <article class="panel">
+        <h2>Spend Distribution (Selected Cluster)</h2>
+        <div id="spendDistribution" class="chart"></div>
+      </article>
+      <article class="panel">
+        <h2>Recency vs Spend (Selected Cluster)</h2>
+        <div id="recencySpendScatter" class="chart"></div>
+      </article>
+    </section>
+
+    <section class="grid charts">
+      <article class="panel">
+        <h2>Cluster Interpretation</h2>
+        <div class="table-wrap">
+          <table id="interpretTable">
+            <thead>
+              <tr>
+                <th>Cluster</th>
+                <th>Top Category</th>
+                <th>Top %</th>
+                <th>Top Words</th>
+                <th>Hypothesis</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="table-head">
+        <h2>Customers By Cluster</h2>
+        <label>
+          Cluster:
+          <select id="clusterFilter"></select>
+        </label>
+      </div>
+      <p class="hint">Showing first 300 rows for fast FE rendering.</p>
+      <div class="table-wrap">
+        <table id="customersTable">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="./main.js"></script>
+</body>
+</html>
