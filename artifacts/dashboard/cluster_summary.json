@@ -1,0 +1,44 @@
+[
+  {
+    "cluster": 1,
+    "customer_count": 1120,
+    "avg_count": 5.004464285714286,
+    "avg_mean": 269.72955357142854,
+    "avg_sum": 1348.6631696428572,
+    "avg_LastPurchase": 33.37589285714286,
+    "avg_categ_0": 22.756520057294946,
+    "avg_categ_1": 15.054966875323817,
+    "avg_categ_2": 18.68451938324257,
+    "avg_categ_3": 25.24026372904924,
+    "avg_categ_4": 18.263729955089435,
+    "cluster_name": "Cluster 1"
+  },
+  {
+    "cluster": 2,
+    "customer_count": 71,
+    "avg_count": 5.0,
+    "avg_mean": 56.59718309859155,
+    "avg_sum": 282.98591549295776,
+    "avg_LastPurchase": 34.647887323943664,
+    "avg_categ_0": 22.581037704912703,
+    "avg_categ_1": 15.945221672988382,
+    "avg_categ_2": 21.08729417537331,
+    "avg_categ_3": 23.788988661609423,
+    "avg_categ_4": 16.597457785116184,
+    "cluster_name": "Cluster 2"
+  },
+  {
+    "cluster": 3,
+    "customer_count": 1360,
+    "avg_count": 15.198529411764707,
+    "avg_mean": 522.3302177386196,
+    "avg_sum": 7998.460257352941,
+    "avg_LastPurchase": 18.173529411764704,
+    "avg_categ_0": 24.42785874088785,
+    "avg_categ_1": 12.270622995856526,
+    "avg_categ_2": 19.29924421038052,
+    "avg_categ_3": 24.779402141945827,
+    "avg_categ_4": 19.231890065584935,
+    "cluster_name": "Cluster 3"
+  }
+]

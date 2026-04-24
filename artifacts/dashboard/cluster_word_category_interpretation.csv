@@ -1,0 +1,5 @@
+cluster,top_category,top_category_percent,top_words,hypothesis
+0,categ_2,24.88,"bag, sign, pot, box, ring, vintage, tin, light, flower, design, candle, spot","Cluster 0 nghiêng về category 2 (24.88%), nhóm từ nổi bật: bag, sign, pot, box, ring"
+1,categ_3,26.51,"card, christmas, wrap, decoration, sign, pack, ring, pen, design, flower, pot, wood","Cluster 1 nghiêng về category 3 (26.51%), nhóm từ nổi bật: card, christmas, wrap, decoration, sign"
+2,categ_3,24.51,"necklac, lace, wall, glass, vintage, box, wood, door, doormat, cake, silver, stand","Cluster 2 nghiêng về category 3 (24.51%), nhóm từ nổi bật: necklac, lace, wall, glass, vintage"
+3,categ_3,24.43,"sign, vintage, bag, candle, light, metal, holder, pot, t-light, christmas, design, mug","Cluster 3 nghiêng về category 3 (24.43%), nhóm từ nổi bật: sign, vintage, bag, candle, light"
