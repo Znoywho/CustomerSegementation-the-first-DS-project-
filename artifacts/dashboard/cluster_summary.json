@@ -11,7 +11,7 @@
     "avg_categ_2": 16.029273447001856,
     "avg_categ_3": 19.48286015311558,
     "avg_categ_4": 14.27563786466605,
-    "cluster_name": "(0)Khách Mới"
+    "cluster_name": "(0)Ít tương tác"
   },
   {
     "cluster": 1,
@@ -25,7 +25,7 @@
     "avg_categ_2": 16.168297827211372,
     "avg_categ_3": 22.62747957435517,
     "avg_categ_4": 15.554280072371443,
-    "cluster_name": "(1)Săn Sale"
+    "cluster_name": "(1)VIP"
   },
   {
     "cluster": 2,
@@ -39,7 +39,7 @@
     "avg_categ_2": 14.622836825603573,
     "avg_categ_3": 20.086071862297846,
     "avg_categ_4": 16.139276920400807,
-    "cluster_name": "(2)Ít tương tác"
+    "cluster_name": "(2)Mới"
   },
   {
     "cluster": 3,
@@ -53,6 +53,6 @@
     "avg_categ_2": 16.005042763277046,
     "avg_categ_3": 21.119386089959015,
     "avg_categ_4": 13.725166543124784,
-    "cluster_name": "(3)Khách Hàng Cao Cấp"
+    "cluster_name": "(3)Săn sale"
   }
 ]
